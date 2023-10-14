@@ -35,8 +35,9 @@ async function run() {
 
     // Get Coffee List
     app.get("/coffee", async (req, res) => {
-      const coffee = await coffeeCollection.find();
-      res.send(coffee);
+      const coffee = coffeeCollection.find();
+      const result = await coffee.toArray();
+      res.send(result);
     });
 
     // Get Single Coffee
@@ -66,11 +67,21 @@ async function run() {
     app.put("/coffee/:id", async (req, res) => {
       const id = req.params.id;
       const coffee = req.body;
+
       const filter = { _id: new ObjectId(id) };
       const options = { upsert: true };
       const updatedCoffee = {
-        $set: coffee
-      };
+        $set: {
+          name: coffee.updatedName,
+          chef: coffee.updatedChef,
+          supplier: coffee.updatedSupplier,
+          taste: coffee.updatedTaste,
+          category: coffee.updatedCategory,
+          details: coffee.updatedDetails,
+          photo: coffee.updatedPhoto
+        }
+      }
+
       const result = await coffeeCollection.updateOne(filter, updatedCoffee, options);
       res.send(result);
     })
